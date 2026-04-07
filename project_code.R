@@ -8,17 +8,31 @@ large_dataset <- read.csv("march-madnesss-historical-data.csv")
 original_dataset <- original_dataset %>%
   filter(!is.na(POSTSEASON) & POSTSEASON != "NA" & POSTSEASON != "N/A")
 
-sort(unique(original_dataset$TEAM))
-sort(unique(large_dataset$Team))
-
-gsub("\\s*\\([^)]*\\)\\s*", "", original_dataset$TEAM, ignore.case = TRUE)
-gsub("\\s*\\([^)]*\\)\\s*", "", large_dataset$Team, ignore.case = TRUE)
-
-sort(unique(original_dataset$TEAM))
-sort(unique(large_dataset$Team))
-
 original_dataset$TEAM <- gsub("[^A-Za-z ]", "", original_dataset$TEAM)
 large_dataset$Team <- gsub("[^A-Za-z ]", "", large_dataset$Team)
+
+large_dataset$Team <- gsub("State", "St.", large_dataset$Team)
+
+large_dataset$Team[large_dataset$Team == "Brigham Young"] <- "BYU"
+large_dataset$Team[large_dataset$Team == "FDU"] <- "Fairleigh Dickinson"
+large_dataset$Team[large_dataset$Team == "GardnerWebb"] <- "Gardner Webb"
+large_dataset$Team[large_dataset$Team == "Louisiana"] <- "Louisiana Lafayette"
+large_dataset$Team[large_dataset$Team == "Louisiana St."] <- "LSU"
+large_dataset$Team[large_dataset$Team == "Loyola IL"] <- "Loyola Chicago"
+large_dataset$Team[large_dataset$Team == "Mount St. Marys"] <- "Mount St. Mary's"
+large_dataset$Team[large_dataset$Team == "North Carolina AT"] <- "North Carolina A&T"
+large_dataset$Team[large_dataset$Team == "Prairie View"] <- "Prairie View A&M"
+large_dataset$Team[large_dataset$Team == "Saint Josephs"] <- "Saint Joseph's"
+large_dataset$Team[large_dataset$Team == "Saint Marys"] <- "Saint Mary's"
+large_dataset$Team[large_dataset$Team == "Saint Peters"] <- "Saint Peter's"
+large_dataset$Team[large_dataset$Team == "St Johns NY"] <- "St. John's"
+large_dataset$Team[large_dataset$Team == "Stephen F Austin"] <- "Stephen F. Austin"
+large_dataset$Team[large_dataset$Team == "Texas AM"] <- "Texas A&M"
+large_dataset$Team[large_dataset$Team == "Texas AMCorpus Christi"] <- "Texas A&M Corpus Chris"
+
+
+sort(unique(original_dataset$TEAM))
+sort(unique(large_dataset$Team))
 
 # Create list of unique teams
 original_teams_unique <- sort(unique(original_dataset$TEAM))
@@ -33,8 +47,8 @@ original_dataset <- original_dataset %>%
 # DATA CLEANING 2: Standardize 
 merged_dataset <- merge(original_dataset,
                         large_dataset[, c("Team", "Year", "OppO", "OppD", "Made.Round.of.16")], 
-                        by.x = c("Team", "Year"), 
-                        by.y = c("TEAM", "YEAR")
+                        by.x = c("TEAM", "YEAR"),
+                        by.y = c("Team", "Year")
                         )
 
 # DATA CLEANING 3: Create new variable NetRtg (net rating)
