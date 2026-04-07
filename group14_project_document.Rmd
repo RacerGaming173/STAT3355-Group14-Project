@@ -1,3 +1,19 @@
+---
+title: "Group 14 Project"
+author: "Edison Cheah, Dev Nair, Eldrick Chen"
+date: "04/07/2026"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r better_notation}
+ options(scipen = 999)
+```
+
+```{r}
 library(dplyr)
 
 # Load in March Madness datasets
@@ -30,10 +46,6 @@ large_dataset$Team[large_dataset$Team == "Stephen F Austin"] <- "Stephen F. Aust
 large_dataset$Team[large_dataset$Team == "Texas AM"] <- "Texas A&M"
 large_dataset$Team[large_dataset$Team == "Texas AMCorpus Christi"] <- "Texas A&M Corpus Chris"
 
-
-sort(unique(original_dataset$TEAM))
-sort(unique(large_dataset$Team))
-
 # Create list of unique teams
 original_teams_unique <- sort(unique(original_dataset$TEAM))
 large_teams_unique <- sort(unique(large_dataset$Team))
@@ -53,3 +65,4 @@ merged_dataset <- merge(original_dataset,
 
 # DATA CLEANING 3: Create new variable NetRtg (net rating)
 merged_dataset$NetRtg <- merged_dataset$OppO - merged_dataset$OppD
+```
