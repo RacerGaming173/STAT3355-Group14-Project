@@ -13,9 +13,8 @@ knitr::opts_chunk$set(echo = FALSE)
  options(scipen = 999)
 ```
 
-```{r}
+```{r message=FALSE}
 library(dplyr)
-library()
 
 # Load in March Madness datasets
 original_dataset <- read.csv("cbb.csv")
@@ -76,3 +75,15 @@ merged_dataset <- merge(original_dataset,
 # DATA CLEANING 4: Create new variable NetRtg (net rating)
 merged_dataset$NetRtg <- merged_dataset$OppO - merged_dataset$OppD
 ```
+
+# Data Cleaning Identification and Justification
+
+In order to properly use our March Madness datasets, they need to be standardized and made relevant. This section outlines the three data cleaning steps we took to perform analysis on our data.
+
+1. The original dataset provided was purged of non-tournament teams. Since most of the March Madness datasets we found only included teams who qualified for the postseason, a more robust analysis can be performed by only looking at in-tournament teams. Also, it allows us to focus on our pending question of what stats define postseason success for a team. Below is a preview of the data before and after this step.
+
+`r knitr::kable(list(non_purged_data[50:60, ], purged_data[50:60, ]))`
+
+2. Team names were standardized between datasets prior to merging them. 
+
+3. The datasets were merged, with the final dataset being the original dataset with the supplementary dataset's columns: OppO, OppD, Made.Round.of.16. With these columns, we can calculate another performance metric (net rating) and better assess postseason success. Additional columns may be merged in the future to expand upon our data analysis.
