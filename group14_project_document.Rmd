@@ -29,7 +29,6 @@ original_dataset <- original_dataset %>%
 purged_data <- original_dataset[, c("TEAM", "POSTSEASON")]
 
 # DATA CLEANING 2: Standardize team names
-unstandardized_original_teams <- sort(unique(original_dataset$TEAM))
 unstandardized_large_teams <- sort(unique(large_dataset$Team))
 
 original_dataset$TEAM <- gsub("[^A-Za-z ]", "", original_dataset$TEAM)
@@ -80,10 +79,14 @@ merged_dataset$NetRtg <- merged_dataset$OppO - merged_dataset$OppD
 
 In order to properly use our March Madness datasets, they need to be standardized and made relevant. This section outlines the three data cleaning steps we took to perform analysis on our data.
 
-1. The original dataset provided was purged of non-tournament teams. Since most of the March Madness datasets we found only included teams who qualified for the postseason, a more robust analysis can be performed by only looking at in-tournament teams. Also, it allows us to focus on our pending question of what stats define postseason success for a team. Below is a preview of the data before and after this step.
+1. The original dataset provided was purged of non-tournament teams. Since most of the March Madness datasets we found only included teams who qualified for the postseason, a more robust analysis can be performed by only looking at in-tournament teams. Also, it allows us to focus on our pending question of what stats define postseason success for a team. Table 1 shows a preview of the data before and after this step.
 
-`r knitr::kable(list(non_purged_data[50:60, ], purged_data[50:60, ]))`
+`r knitr::kable(list(non_purged_data[50:60, ], purged_data[50:60, ]), caption = "Comparison of before (left) vs. after (right) purging non-tournament teams")`
 
-2. Team names were standardized between datasets prior to merging them. 
+2. Team names were standardized between datasets, following the convention of the original dataset. By doing this, fields across datasets can be joined based on common Team and Year fields upon merging. Table 2 is a preview of the data before and after this step.
 
-3. The datasets were merged, with the final dataset being the original dataset with the supplementary dataset's columns: OppO, OppD, Made.Round.of.16. With these columns, we can calculate another performance metric (net rating) and better assess postseason success. Additional columns may be merged in the future to expand upon our data analysis.
+`r knitr::kable(list(unstandardized_large_teams[c(15, 21, 22, 44, 98)], large_teams_unique[c(15, 21, 22, 44, 98)]), caption = "Comparison of before (left) vs. after (right) standardizing names")`
+
+3. The datasets were merged based on commonalities of Team and Year, with the final dataset being the original dataset with the supplementary dataset's columns: OppO, OppD, Made.Round.of.16. With these columns, we can calculate another performance metric (net rating) and better assess postseason success. Additional columns may be merged in the future to expand upon our data analysis. Table 3 shows a comparison of column names from the original dataset and the merged dataset.
+
+`r knitr::kable(list(colnames(original_dataset), colnames(merged_dataset)), caption = "Comparison of column names before (left) vs. after (right) merging datasets")`
