@@ -15,14 +15,23 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ```{r}
 library(dplyr)
+library()
 
 # Load in March Madness datasets
 original_dataset <- read.csv("cbb.csv")
 large_dataset <- read.csv("march-madnesss-historical-data.csv")
 
 # DATA CLEANING 1: Purge all non-tournament teams from dataset
+non_purged_data <- original_dataset[, c("TEAM", "POSTSEASON")]
+
 original_dataset <- original_dataset %>%
   filter(!is.na(POSTSEASON) & POSTSEASON != "NA" & POSTSEASON != "N/A")
+
+purged_data <- original_dataset[, c("TEAM", "POSTSEASON")]
+
+# DATA CLEANING 2: Standardize team names
+unstandardized_original_teams <- sort(unique(original_dataset$TEAM))
+unstandardized_large_teams <- sort(unique(large_dataset$Team))
 
 original_dataset$TEAM <- gsub("[^A-Za-z ]", "", original_dataset$TEAM)
 large_dataset$Team <- gsub("[^A-Za-z ]", "", large_dataset$Team)
@@ -56,13 +65,13 @@ large_dataset <- large_dataset %>%
 original_dataset <- original_dataset %>%
   filter(TEAM %in% merged_teams_unique & !(YEAR %in% c(2012, 2024)))
 
-# DATA CLEANING 2: Standardize 
+# DATA CLEANING 3: Merge datasets based on team and year
 merged_dataset <- merge(original_dataset,
                         large_dataset[, c("Team", "Year", "OppO", "OppD", "Made.Round.of.16")], 
                         by.x = c("TEAM", "YEAR"),
                         by.y = c("Team", "Year")
                         )
 
-# DATA CLEANING 3: Create new variable NetRtg (net rating)
+# DATA CLEANING 4: Create new variable NetRtg (net rating)
 merged_dataset$NetRtg <- merged_dataset$OppO - merged_dataset$OppD
 ```
