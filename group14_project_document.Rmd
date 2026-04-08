@@ -60,6 +60,7 @@ original_teams_unique <- sort(unique(original_dataset$TEAM))
 large_teams_unique <- sort(unique(large_dataset$Team))
 merged_teams_unique <- intersect(original_teams_unique, large_teams_unique)
 
+# Filter data to only include common teams/years
 large_dataset <- large_dataset %>%
   filter(Team %in% merged_teams_unique & !(Year %in% c(2012, 2024)))
 original_dataset <- original_dataset %>%
