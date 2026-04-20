@@ -66,13 +66,29 @@ original_dataset <- original_dataset %>%
 
 # DATA CLEANING 3: Merge datasets based on team and year
 merged_dataset <- merge(original_dataset,
-                        large_dataset[, c("Team", "Year", "OppO", "OppD", "Made.Round.of.16")], 
+                        large_dataset[, c("Team", 
+                                          "Year", 
+                                          "OppO", 
+                                          "OppD", 
+                                          "Made.Round.of.16",
+                                          "Conf..W",
+                                          "Conf..L",
+                                          "Home.W",
+                                          "Home.L",
+                                          "Away.W",
+                                          "Away.L")], 
                         by.x = c("TEAM", "YEAR"),
                         by.y = c("Team", "Year")
                         )
 
 # DATA CLEANING 4: Create new variable NetRtg (net rating)
 merged_dataset$NetRtg <- merged_dataset$OppO - merged_dataset$OppD
+
+# Calculate win %s
+merged_dataset$HomeWinPct <- round(merged_dataset$Home.W / (merged_dataset$Home.W + merged_dataset$Home.L), 3)
+merged_dataset$AwayWinPct <- round(merged_dataset$Away.W / (merged_dataset$Away.W + merged_dataset$Away.L), 3)
+merged_dataset$ConfWinPct <- round(merged_dataset$Conf..W / (merged_dataset$Conf..W + merged_dataset$Conf..L), 3)
+merged_dataset$OvrWinPct <- round(merged_dataset$W / merged_dataset$G, 3)
 ```
 
 # Data Cleaning Identification and Justification
