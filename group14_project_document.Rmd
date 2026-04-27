@@ -18,7 +18,8 @@ library(dplyr)
 
 # Load in March Madness datasets
 original_dataset <- read.csv("cbb.csv")
-large_dataset <- read.csv("march-madnesss-historical-data.csv")
+dataset1 <- read.csv("march-madnesss-historical-data.csv")
+dataset2 <- read.csv("Int _ KenPom _ Height.csv")
 
 # DATA CLEANING 1: Purge all non-tournament teams from dataset
 non_purged_data <- original_dataset[, c("TEAM", "POSTSEASON")]
@@ -29,85 +30,188 @@ original_dataset <- original_dataset %>%
 purged_data <- original_dataset[, c("TEAM", "POSTSEASON")]
 
 # DATA CLEANING 2: Standardize team names
-unstandardized_large_teams <- sort(unique(large_dataset$Team))
+unstandardized_large_teams <- sort(unique(dataset1$Team))
 
 original_dataset$TEAM <- gsub("[^A-Za-z ]", "", original_dataset$TEAM)
-large_dataset$Team <- gsub("[^A-Za-z ]", "", large_dataset$Team)
+dataset1$Team <- gsub("[^A-Za-z ]", "", dataset1$Team)
 
-large_dataset$Team <- gsub("State", "St.", large_dataset$Team)
+dataset1$Team <- gsub("State", "St.", dataset1$Team)
 
-large_dataset$Team[large_dataset$Team == "Brigham Young"] <- "BYU"
-large_dataset$Team[large_dataset$Team == "FDU"] <- "Fairleigh Dickinson"
-large_dataset$Team[large_dataset$Team == "GardnerWebb"] <- "Gardner Webb"
-large_dataset$Team[large_dataset$Team == "Louisiana"] <- "Louisiana Lafayette"
-large_dataset$Team[large_dataset$Team == "Louisiana St."] <- "LSU"
-large_dataset$Team[large_dataset$Team == "Loyola IL"] <- "Loyola Chicago"
-large_dataset$Team[large_dataset$Team == "Mount St. Marys"] <- "Mount St. Mary's"
-large_dataset$Team[large_dataset$Team == "North Carolina AT"] <- "North Carolina A&T"
-large_dataset$Team[large_dataset$Team == "Prairie View"] <- "Prairie View A&M"
-large_dataset$Team[large_dataset$Team == "Saint Josephs"] <- "Saint Joseph's"
-large_dataset$Team[large_dataset$Team == "Saint Marys"] <- "Saint Mary's"
-large_dataset$Team[large_dataset$Team == "Saint Peters"] <- "Saint Peter's"
-large_dataset$Team[large_dataset$Team == "St Johns NY"] <- "St. John's"
-large_dataset$Team[large_dataset$Team == "Stephen F Austin"] <- "Stephen F. Austin"
-large_dataset$Team[large_dataset$Team == "Texas AM"] <- "Texas A&M"
-large_dataset$Team[large_dataset$Team == "Texas AMCorpus Christi"] <- "Texas A&M Corpus Chris"
+dataset1$Team[dataset1$Team == "Brigham Young"] <- "BYU"
+dataset1$Team[dataset1$Team == "FDU"] <- "Fairleigh Dickinson"
+dataset1$Team[dataset1$Team == "GardnerWebb"] <- "Gardner Webb"
+dataset1$Team[dataset1$Team == "Louisiana"] <- "Louisiana Lafayette"
+dataset1$Team[dataset1$Team == "Louisiana St."] <- "LSU"
+dataset1$Team[dataset1$Team == "Loyola IL"] <- "Loyola Chicago"
+dataset1$Team[dataset1$Team == "North Carolina AT"] <- "North Carolina A&T"
+dataset1$Team[dataset1$Team == "Prairie View"] <- "Prairie View A&M"
+dataset1$Team[dataset1$Team == "Saint Josephs"] <- "Saint Joseph's"
+dataset1$Team[dataset1$Team == "Saint Marys"] <- "Saint Mary's"
+dataset1$Team[dataset1$Team == "Saint Peters"] <- "Saint Peter's"
+dataset1$Team[dataset1$Team == "St Johns NY"] <- "St John's"
+dataset1$Team[dataset1$Team == "Stephen F Austin"] <- "Stephen F. Austin"
+dataset1$Team[dataset1$Team == "Texas AM"] <- "Texas A&M"
+dataset1$Team[dataset1$Team == "Texas AMCorpus Christi"] <- "Texas A&M Corpus Chris"
+
+dataset2$Team[dataset2$Team == "St. Bonaventure"] <- "St Bonaventure"
+dataset2$Team[dataset2$Team == "Mount St. Mary's"] <- "Mount St Marys"
 
 # Create list of unique teams
 original_teams_unique <- sort(unique(original_dataset$TEAM))
-large_teams_unique <- sort(unique(large_dataset$Team))
-merged_teams_unique <- intersect(original_teams_unique, large_teams_unique)
+ds1_teams_unique <- sort(unique(dataset1$Team))
+ds2_teams_unique <- sort(unique(dataset2$Team))
+merged_teams_unique <- intersect(original_teams_unique, ds1_teams_unique)
+merged_teams_unique <- intersect(merged_teams_unique, ds2_teams_unique)
 
 # Filter data to only include common teams/years
-large_dataset <- large_dataset %>%
+dataset1 <- dataset1 %>%
   filter(Team %in% merged_teams_unique & !(Year %in% c(2012, 2024)))
 original_dataset <- original_dataset %>%
   filter(TEAM %in% merged_teams_unique & !(YEAR %in% c(2012, 2024)))
 
 # DATA CLEANING 3: Merge datasets based on team and year
 merged_dataset <- merge(original_dataset,
-                        large_dataset[, c("Team", 
-                                          "Year", 
-                                          "X3P.", 
-                                          "FG.",
-                                          "OppD",
-                                          "OppO",
-                                          "FT.",
-                                          "Made.Round.of.16",
-                                          "Conf..W",
-                                          "Conf..L",
-                                          "Home.W",
-                                          "Home.L",
-                                          "Away.W",
-                                          "Away.L")], 
+                        dataset1[, c("Team", 
+                                     "Year", 
+                                     "FG.",
+                                     "OppD",
+                                     "OppO",
+                                     "FT.",
+                                     "Made.Round.of.16",
+                                     "Conf..W",
+                                     "Conf..L",
+                                     "Home.W",
+                                     "Home.L",
+                                     "Away.W",
+                                     "Away.L",
+                                     "SOS")], 
                         by.x = c("TEAM", "YEAR"),
                         by.y = c("Team", "Year")
 )
 
+merged_dataset <- merge(merged_dataset,
+                        dataset2[, c("TeamName", 
+                                     "Season", 
+                                     "AvgHeight")], 
+                        by.x = c("TEAM", "YEAR"),
+                        by.y = c("TeamName", "Season")
+)
+
+# Write out full conference names
+merged_dataset$CONF <- factor(merged_dataset$CONF,
+                              levels=unique(sort(merged_dataset$CONF)),
+                              labels=c("Atlantic 10",
+                                       "Atlantic Coast Conference",
+                                       "America East",
+                                       "American",
+                                       "ASUN",
+                                       "Big Ten",
+                                       "Big 12",
+                                       "Big East",
+                                       "Big Sky",
+                                       "Big South",
+                                       "Big West",
+                                       "Colonial Athletic Association",
+                                       "Conference USA",
+                                       "Horizon League",
+                                       "Ivy League",
+                                       "Metro Atlantic Athletic Conference",
+                                       "Mid-American Conference",
+                                       "Mid-Eastern Athletic Conference",
+                                       "Missouri Valley Conference",
+                                       "Mountain West",
+                                       "Northeast Conference",
+                                       "Ohio Valley Conference",
+                                       "Pac-12",
+                                       "Patriot League",
+                                       "Sun Belt",
+                                       "Southern Conference",
+                                       "South Eastern Conference",
+                                       "Southland Conference",
+                                       "Summit League",
+                                       "Southwestern Athletic Conference",
+                                       "Western Athletic Conference",
+                                       "West Coast Conference"
+                                       ))
+
 # DATA CLEANING 4: Create new variable OppNetRtg (net rating)
 merged_dataset$OppNetRtg <- merged_dataset$OppO - merged_dataset$OppD
 
-
-# DATA CLEANING 5: change POSTSZN var to numerical var RoundNum
-round_map <- c(
-  "R64" = 1,
-  "R32" = 2,
-  "S16" = 3,
-  "E8"  = 4,
-  "F4"  = 5,
-  "2ND" = 6,
-  "Champions" = 7
-)
-
-merged_dataset$RoundNum <- round_map[merged_dataset$POSTSEASON]
-
-merged_dataset <- merged_dataset[!is.na(merged_dataset$RoundNum), ]
+merged_dataset$POSTSEASON <- factor(merged_dataset$POSTSEASON, 
+                                    labels=c("R68", "R64", "R32", "S16", "E8", "F4", "2ND", "Champions"), 
+                                    ordered=TRUE)
 
 # Calculate win %s
 merged_dataset$HomeWinPct <- round(merged_dataset$Home.W / (merged_dataset$Home.W + merged_dataset$Home.L), 3)
 merged_dataset$AwayWinPct <- round(merged_dataset$Away.W / (merged_dataset$Away.W + merged_dataset$Away.L), 3)
 merged_dataset$ConfWinPct <- round(merged_dataset$Conf..W / (merged_dataset$Conf..W + merged_dataset$Conf..L), 3)
 merged_dataset$OvrWinPct <- round(merged_dataset$W / merged_dataset$G, 3)
+
+#Subset based on Sweet 16 qualification
+teams_made_S16 <- merged_dataset[which(merged_dataset$Made.Round.of.16 == 1), ]
+teams_no_S16 <- merged_dataset[which(merged_dataset$Made.Round.of.16 == 0), ]
+
+# Two sided t-tests
+t.test(teams_made_S16$HomeWinPct, teams_no_S16$HomeWinPct, "two.sided")
+t.test(teams_made_S16$AwayWinPct, teams_no_S16$AwayWinPct, "two.sided")
+t.test(teams_made_S16$ConfWinPct, teams_no_S16$ConfWinPct, "two.sided")
+t.test(teams_made_S16$OvrWinPct, teams_no_S16$OvrWinPct, "two.sided")
+
+# Box plots of success vs records
+library(ggplot2)
+ggplot(merged_dataset, aes(HomeWinPct, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
+  geom_boxplot() +
+  labs(x="Win % (Home Games)", y="Whether Team Reached Sweet 16")
+
+ggplot(merged_dataset, aes(AwayWinPct, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
+  geom_boxplot() +
+  labs(x="Win % (Away Games)", y="Whether Team Reached Sweet 16")
+
+ggplot(merged_dataset, aes(ConfWinPct, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
+  geom_boxplot() +
+  labs(x="Win % (Conference Games)", y="Whether Team Reached Sweet 16")
+
+ggplot(merged_dataset, aes(OvrWinPct, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
+  geom_boxplot() +
+  labs(x="Win % (Overall Games)", y="Whether Team Reached Sweet 16")
+
+# Analyzing 3PT%, 2PT%, FG%, FT%
+t.test(teams_made_S16$X3P_O, teams_no_S16$X3P_O, "two.sided")
+t.test(teams_made_S16$X2P_O, teams_no_S16$X2P_O, "two.sided")
+t.test(teams_made_S16$FG., teams_no_S16$FG., "two.sided")
+t.test(teams_made_S16$FT., teams_no_S16$FT., "two.sided")
+
+# Analyzing height
+OppD_vs_height <- lm(merged_dataset$OppD ~ merged_dataset$AvgHeight)
+summary(OppD_vs_height)
+confint(OppD_vs_height)
+
+ggplot(merged_dataset, aes(AvgHeight, OppD)) +
+  geom_point() +
+  geom_smooth(method="lm")
+
+EFG_D_vs_height <- lm(merged_dataset$EFG_D ~ merged_dataset$AvgHeight)
+summary(EFG_D_vs_height)
+confint(EFG_D_vs_height)
+
+ggplot(merged_dataset, aes(AvgHeight, EFG_D)) +
+  geom_point() +
+  geom_smooth(method="lm")
+
+t.test(teams_made_S16$AvgHeight, teams_no_S16$AvgHeight, "two.sided")
+
+ggplot(merged_dataset, aes(AvgHeight, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
+  geom_boxplot() +
+  labs(x="Average Height (in)", y="Whether Team Reached Sweet 16")
+
+t.test(teams_made_S16$SOS, teams_no_S16$SOS, "two.sided")
+
+ggplot(merged_dataset, aes(SOS, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
+  geom_boxplot() +
+  labs(x="Strength of Schedule", y="Whether Team Reached Sweet 16")
+
+contingency_table <- table(merged_dataset$CONF, merged_dataset$Made.Round.of.16)
+chisq.test(contingency_table)
 ```
 
 # Data Cleaning Identification and Justification
