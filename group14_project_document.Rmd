@@ -181,6 +181,22 @@ t.test(teams_made_S16$X2P_O, teams_no_S16$X2P_O, "two.sided")
 t.test(teams_made_S16$FG., teams_no_S16$FG., "two.sided")
 t.test(teams_made_S16$FT., teams_no_S16$FT., "two.sided")
 
+ggplot(merged_dataset, aes(X3P_O, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
+  geom_boxplot() +
+  labs(x="Three Point %", y="Whether Team Reached Sweet 16")
+
+ggplot(merged_dataset, aes(X2P_O, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
+  geom_boxplot() +
+  labs(x="Two Point %", y="Whether Team Reached Sweet 16")
+
+ggplot(merged_dataset, aes(FG., factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
+  geom_boxplot() +
+  labs(x="Field Goal %", y="Whether Team Reached Sweet 16")
+
+ggplot(merged_dataset, aes(FT., factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
+  geom_boxplot() +
+  labs(x="Free Throw %", y="Whether Team Reached Sweet 16")
+
 # Analyzing height
 OppD_vs_height <- lm(merged_dataset$OppD ~ merged_dataset$AvgHeight)
 summary(OppD_vs_height)
