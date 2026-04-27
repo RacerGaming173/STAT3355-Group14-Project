@@ -197,6 +197,19 @@ ggplot(merged_dataset, aes(FT., factor(Made.Round.of.16, labels=c("No", "Yes")))
   geom_boxplot() +
   labs(x="Free Throw %", y="Whether Team Reached Sweet 16")
 
+# Analyzing TORD, TOR, ADJDE vs made S16
+ggplot(merged_dataset, aes(TORD, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
+  geom_boxplot() +
+  labs(x="Defensive TO Rate", y="Whether Team Reached Sweet 16")
+
+ggplot(merged_dataset, aes(ADJDE, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
+  geom_boxplot() +
+  labs(x="Defensive Efficiency", y="Whether Team Reached Sweet 16")
+
+ggplot(merged_dataset, aes(TOR, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
+  geom_boxplot() +
+  labs(x="TO Rate", y="Whether Team Reached Sweet 16")
+
 # Analyzing height
 OppD_vs_height <- lm(merged_dataset$OppD ~ merged_dataset$AvgHeight)
 summary(OppD_vs_height)
