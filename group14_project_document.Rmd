@@ -68,8 +68,11 @@ original_dataset <- original_dataset %>%
 merged_dataset <- merge(original_dataset,
                         large_dataset[, c("Team", 
                                           "Year", 
-                                          "OppO", 
-                                          "OppD", 
+                                          "X3P.", 
+                                          "FG.",
+                                          "OppD",
+                                          "OppO",
+                                          "FT.",
                                           "Made.Round.of.16",
                                           "Conf..W",
                                           "Conf..L",
@@ -79,10 +82,26 @@ merged_dataset <- merge(original_dataset,
                                           "Away.L")], 
                         by.x = c("TEAM", "YEAR"),
                         by.y = c("Team", "Year")
-                        )
+)
 
-# DATA CLEANING 4: Create new variable NetRtg (net rating)
-merged_dataset$NetRtg <- merged_dataset$OppO - merged_dataset$OppD
+# DATA CLEANING 4: Create new variable OppNetRtg (net rating)
+merged_dataset$OppNetRtg <- merged_dataset$OppO - merged_dataset$OppD
+
+
+# DATA CLEANING 5: change POSTSZN var to numerical var RoundNum
+round_map <- c(
+  "R64" = 1,
+  "R32" = 2,
+  "S16" = 3,
+  "E8"  = 4,
+  "F4"  = 5,
+  "2ND" = 6,
+  "Champions" = 7
+)
+
+merged_dataset$RoundNum <- round_map[merged_dataset$POSTSEASON]
+
+merged_dataset <- merged_dataset[!is.na(merged_dataset$RoundNum), ]
 
 # Calculate win %s
 merged_dataset$HomeWinPct <- round(merged_dataset$Home.W / (merged_dataset$Home.W + merged_dataset$Home.L), 3)
