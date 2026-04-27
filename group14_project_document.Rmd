@@ -181,6 +181,11 @@ t.test(teams_made_S16$X2P_O, teams_no_S16$X2P_O, "two.sided")
 t.test(teams_made_S16$FG., teams_no_S16$FG., "two.sided")
 t.test(teams_made_S16$FT., teams_no_S16$FT., "two.sided")
 
+# Analyzing TOR, TORD, ADJDE
+t.test(teams_made_S16$TOR, teams_no_S16$TOR, "two.sided")
+t.test(teams_made_S16$TORD, teams_no_S16$TORD, "two.sided")
+t.test(teams_made_S16$ADJDE, teams_no_S16$ADJDE, "two.sided")
+
 ggplot(merged_dataset, aes(X3P_O, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
   geom_boxplot() +
   labs(x="Three Point %", y="Whether Team Reached Sweet 16")
