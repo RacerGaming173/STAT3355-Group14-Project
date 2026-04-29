@@ -74,7 +74,7 @@ merged_dataset <- merge(original_dataset,
                         dataset1[, c("Team", 
                                      "Year", 
                                      "FG.",
-                                     "OppD",
+                                     "OppO",
                                      "OppO",
                                      "FT.",
                                      "Made.Round.of.16",
@@ -135,7 +135,7 @@ merged_dataset$CONF <- factor(merged_dataset$CONF,
                                        ))
 
 # DATA CLEANING 4: Create new variable OppNetRtg (net rating)
-merged_dataset$OppNetRtg <- merged_dataset$OppO - merged_dataset$OppD
+merged_dataset$OppNetRtg <- merged_dataset$OppO - merged_dataset$OppO
 
 merged_dataset$POSTSEASON <- factor(merged_dataset$POSTSEASON, 
                                     labels=c("R68", "R64", "R32", "S16", "E8", "F4", "2ND", "Champions"), 
@@ -159,78 +159,135 @@ t.test(teams_made_S16$OvrWinPct, teams_no_S16$OvrWinPct, "two.sided")
 
 # Box plots of success vs records
 library(ggplot2)
+theme_update(text=element_text(size=14))
+
 ggplot(merged_dataset, aes(HomeWinPct, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
   geom_boxplot() +
-  labs(x="Win % (Home Games)", y="Whether Team Reached Sweet 16")
+  labs(title="Home Win % Among Sweet 16 vs. Non-Sweet 16 Teams",
+       x="Win % (Home Games)", 
+       y="Whether Team Reached Sweet 16")
 
 ggplot(merged_dataset, aes(AwayWinPct, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
   geom_boxplot() +
-  labs(x="Win % (Away Games)", y="Whether Team Reached Sweet 16")
+  labs(title="Away Win % Among Sweet 16 vs. Non-Sweet 16 Teams",
+       x="Win % (Away Games)",
+       y="Whether Team Reached Sweet 16")
 
 ggplot(merged_dataset, aes(ConfWinPct, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
   geom_boxplot() +
-  labs(x="Win % (Conference Games)", y="Whether Team Reached Sweet 16")
+  labs(title="Conference Win % Among Sweet 16 vs. Non-Sweet 16 Teams",
+       x="Win % (Conference Games)", 
+       y="Whether Team Reached Sweet 16")
 
 ggplot(merged_dataset, aes(OvrWinPct, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
   geom_boxplot() +
-  labs(x="Win % (Overall Games)", y="Whether Team Reached Sweet 16")
+  labs(title="Overall Win % Among Sweet 16 vs. Non-Sweet 16 Teams",
+       x="Win % (Overall Games)", 
+       y="Whether Team Reached Sweet 16")
 
 # Analyzing 3PT%, 2PT%, FG%, FT%
 t.test(teams_made_S16$X3P_O, teams_no_S16$X3P_O, "two.sided")
 t.test(teams_made_S16$X2P_O, teams_no_S16$X2P_O, "two.sided")
-t.test(teams_made_S16$FG., teams_no_S16$FG., "two.sided")
+t.test(teams_made_S16$FG.*100, teams_no_S16$FG.*100, "two.sided")
 t.test(teams_made_S16$FT., teams_no_S16$FT., "two.sided")
 
-# Analyzing TOR, TORD, ADJDE
+# Analyzing TOR, TORD
 t.test(teams_made_S16$TOR, teams_no_S16$TOR, "two.sided")
-t.test(teams_made_S16$TORD, teams_no_S16$TORD, "two.sided")
-t.test(teams_made_S16$ADJDE, teams_no_S16$ADJDE, "two.sided")
 
 ggplot(merged_dataset, aes(X3P_O, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
   geom_boxplot() +
-  labs(x="Three Point %", y="Whether Team Reached Sweet 16")
+  labs(title="3P% Among Sweet 16 vs. Non-Sweet 16 Teams",
+       x="Three Point %", 
+       y="Whether Team Reached Sweet 16")
 
 ggplot(merged_dataset, aes(X2P_O, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
   geom_boxplot() +
-  labs(x="Two Point %", y="Whether Team Reached Sweet 16")
+  labs(title="2P% Among Sweet 16 vs. Non-Sweet 16 Teams",
+       x="Two Point %", 
+       y="Whether Team Reached Sweet 16")
 
 ggplot(merged_dataset, aes(FG., factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
   geom_boxplot() +
   labs(x="Field Goal %", y="Whether Team Reached Sweet 16")
 
-ggplot(merged_dataset, aes(FT., factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
+ggplot(merged_dataset, aes(FT.*100, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
   geom_boxplot() +
-  labs(x="Free Throw %", y="Whether Team Reached Sweet 16")
+  labs(title="FT% Among Sweet 16 vs. Non-Sweet 16 Teams",
+       x="Free Throw %", 
+       y="Whether Team Reached Sweet 16")
 
-# Analyzing TORD, TOR, ADJDE vs made S16
-ggplot(merged_dataset, aes(TORD, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
+# Analyzing TOR vs made S16
+ggplot(merged_dataset, aes(TOR, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
   geom_boxplot() +
-  labs(x="Defensive TO Rate", y="Whether Team Reached Sweet 16")
+  labs(title="TO% Among Sweet 16 vs. Non-Sweet 16 Teams",
+       x="Turnover %", 
+       y="Whether Team Reached Sweet 16")
+
+# Analyzing defensive metrics
+t.test(teams_made_S16$ADJDE, teams_no_S16$ADJDE, "two.sided")
+t.test(teams_made_S16$X3P_D, teams_no_S16$X3P_D, "two.sided")
+t.test(teams_made_S16$X2P_D, teams_no_S16$X2P_D, "two.sided")
+t.test(teams_made_S16$TORD, teams_no_S16$TORD, "two.sided")
+t.test(teams_made_S16$OppO, teams_no_S16$OppO, "two.sided")
 
 ggplot(merged_dataset, aes(ADJDE, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
   geom_boxplot() +
-  labs(x="Defensive Efficiency", y="Whether Team Reached Sweet 16")
+  labs(title="AdjDE Among Sweet 16 vs. Non-Sweet 16 Teams",
+       x="Adjusted Defensive Efficiency", 
+       y="Whether Team Reached Sweet 16")
 
-ggplot(merged_dataset, aes(TOR, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
+ggplot(merged_dataset, aes(X3P_D, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
   geom_boxplot() +
-  labs(x="TO Rate", y="Whether Team Reached Sweet 16")
+  labs(title="Opponent 3P% Among Sweet 16 vs. Non-Sweet 16 Teams",
+       x="Opponent Three Point %", 
+       y="Whether Team Reached Sweet 16")
+
+ggplot(merged_dataset, aes(X2P_D, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
+  geom_boxplot() +
+  labs(title="Opponent 2P% Among Sweet 16 vs. Non-Sweet 16 Teams",
+       x="Opponent Two Point %",
+       y="Whether Team Reached Sweet 16")
+
+ggplot(merged_dataset, aes(TORD, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
+  geom_boxplot() +
+  labs(title="Opponent TO% Among Sweet 16 vs. Non-Sweet 16 Teams",
+       x="Opponent Turnover %",
+       y="Whether Team Reached Sweet 16")
+
+ggplot(merged_dataset, aes(OppO, factor(Made.Round.of.16, labels=c("No", "Yes")))) + 
+  geom_boxplot() +
+  labs(x="Opponent Defensive Rating", y="Whether Team Reached Sweet 16")
 
 # Analyzing height
-OppD_vs_height <- lm(merged_dataset$OppD ~ merged_dataset$AvgHeight)
-summary(OppD_vs_height)
-confint(OppD_vs_height)
+AdjDE_vs_height <- lm(merged_dataset$ADJDE ~ merged_dataset$AvgHeight)
+summary(OppO_vs_height)
 
-ggplot(merged_dataset, aes(AvgHeight, OppD)) +
-  geom_point() +
-  geom_smooth(method="lm")
+ggplot(merged_dataset, aes(x = AvgHeight, y = ADJDE, color = factor(Made.Round.of.16))) +
+  geom_point(alpha=0.2) +
+  geom_smooth(method = "lm") +
+  scale_color_manual(values = c("0" = "red", "1" = "blue"),
+                     labels = c("0" = "No", "1" = "Yes")) +
+  labs(
+    title = "AdjDE vs. Average Height by Sweet 16 Qualification",
+    x = "Average Height",
+    y = "Adjusted Defensive Efficiency",
+    color = "Made Sweet 16"
+  )
 
 EFG_D_vs_height <- lm(merged_dataset$EFG_D ~ merged_dataset$AvgHeight)
 summary(EFG_D_vs_height)
-confint(EFG_D_vs_height)
 
-ggplot(merged_dataset, aes(AvgHeight, EFG_D)) +
-  geom_point() +
-  geom_smooth(method="lm")
+ggplot(merged_dataset, aes(x = AvgHeight, y = EFG_D, color = factor(Made.Round.of.16))) +
+  geom_point(alpha=0.2) +
+  geom_smooth(method = "lm") +
+  scale_color_manual(values = c("0" = "red", "1" = "blue"),
+                     labels = c("0" = "No", "1" = "Yes")) +
+  labs(
+    title = "Opponent EFG% vs. Average Height by Sweet 16 Qualification",
+    x = "Average Height",
+    y = "Opponent Effective FG%",
+    color = "Made Sweet 16"
+  )
 
 t.test(teams_made_S16$AvgHeight, teams_no_S16$AvgHeight, "two.sided")
 
@@ -260,6 +317,6 @@ In order to properly use our March Madness datasets, they need to be standardize
 
 `r knitr::kable(list(unstandardized_large_teams[c(15, 21, 22, 44, 98)], large_teams_unique[c(15, 21, 22, 44, 98)]), caption = "Comparison of before (left) vs. after (right) standardizing names")`
 
-3. The datasets were merged based on commonalities of Team and Year, with the final dataset being the original dataset with the supplementary dataset's columns: OppO, OppD, Made.Round.of.16. With these columns, we can calculate another performance metric (net rating) and better assess postseason success. Additional columns may be merged in the future to expand upon our data analysis. Table 3 shows a comparison of column names from the original dataset and the merged dataset.
+3. The datasets were merged based on commonalities of Team and Year, with the final dataset being the original dataset with the supplementary dataset's columns: OppO, OppO, Made.Round.of.16. With these columns, we can calculate another performance metric (net rating) and better assess postseason success. Additional columns may be merged in the future to expand upon our data analysis. Table 3 shows a comparison of column names from the original dataset and the merged dataset.
 
 `r knitr::kable(list(colnames(original_dataset), colnames(merged_dataset)), caption = "Comparison of column names before (left) vs. after (right) merging datasets")`
